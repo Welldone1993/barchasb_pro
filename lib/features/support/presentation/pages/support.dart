@@ -17,7 +17,7 @@ class SupportScreen extends StatelessWidget {
               title: 'سوالات متداول',
               icon: Icons.search_rounded, // آیکون جستجو
               onTap: () {
-                context.go('/faq_screen');
+                context.push('/faq_screen');
               },
             ),
 
@@ -27,7 +27,7 @@ class SupportScreen extends StatelessWidget {
               title: 'ارتباط با ادمین',
               icon: Icons.forum_rounded, // آیکون چت و گفتگو
               onTap: () {
-                context.go('/contact_options');
+                context.push('/contact_options');
               },
             ),
           ],

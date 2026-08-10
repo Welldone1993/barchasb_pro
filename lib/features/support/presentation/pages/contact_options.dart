@@ -47,7 +47,7 @@ class ContactOptionsView extends StatelessWidget {
                 icon: Icons.local_post_office_rounded,
                 // آیکون جایگزین صندوق پست/تیکت
                 onTap: () {
-                  context.go('/ticket');
+                  context.push('/ticket');
                 },
               ),
             ],
