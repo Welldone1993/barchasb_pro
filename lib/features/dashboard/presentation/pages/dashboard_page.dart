@@ -209,7 +209,7 @@ class DashboardPage extends ConsumerWidget {
     int selectedIndex,
     WidgetRef ref,
   ) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12),
     child: GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

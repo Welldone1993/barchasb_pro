@@ -15,6 +15,7 @@ class DashboardGridButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         // ایجاد رنگ فید شده (گرادیان از روشن به تیره)
@@ -59,21 +60,23 @@ class DashboardGridButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Center(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.95),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                // یک سایه خیلی محو به متن هم می‌دهیم تا خواناتر شود
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withOpacity(0.3),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  ),
-                ],
+            child: FittedBox(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.95),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  // یک سایه خیلی محو به متن هم می‌دهیم تا خواناتر شود
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      offset: const Offset(0, 1),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

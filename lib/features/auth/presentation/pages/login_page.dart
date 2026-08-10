@@ -53,6 +53,7 @@ class LoginPage extends ConsumerWidget {
                         controller: phoneController,
                         hint: 'شماره تلفن',
                         icon: Icons.phone_enabled_rounded,
+                        isNumber: true,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -139,11 +140,14 @@ class LoginPage extends ConsumerWidget {
     required String hint,
     required IconData icon,
     bool isPassword = false,
+    bool isNumber = false,
+
   }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,
       textAlign: TextAlign.right,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         hintText: hint,
         filled: true,

@@ -18,14 +18,14 @@ class CustomSubscriptionSegmentView extends ConsumerWidget {
     return Column(
       children: [
         _tabs(ref, selectedIndex),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         _buildTabWidget(selectedIndex),
       ],
     );
   }
 
   Widget _tabs(WidgetRef ref, int selectedIndex) => Container(
-    height: 100,
+    height: 120,
     padding: const EdgeInsets.all(4),
     child: Row(
       children: [

@@ -40,7 +40,7 @@ class JobSeekerAdsView extends ConsumerWidget {
           },
           child: GridView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
@@ -91,7 +91,7 @@ class JobSeekerCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(6.0),
         child: Column(
           children: [
             // عکس پروفایل
@@ -160,27 +160,30 @@ class JobSeekerCard extends StatelessWidget {
             // دکمه‌های پایین کارت
             Row(
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(
-                      Icons.bookmark_border_rounded,
-                      color: primaryDarkBlue,
-                      size: 20,
+                Expanded(
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    onPressed: () {
-                      // عملیات ذخیره
-                    },
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.bookmark_border_rounded,
+                        color: primaryDarkBlue,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        // عملیات ذخیره
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
+                  flex: 2,
                   child: SizedBox(
                     height: 38,
                     child: ElevatedButton(
