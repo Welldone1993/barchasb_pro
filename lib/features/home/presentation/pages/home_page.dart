@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/comming_soon_snack_bar.dart';
 import '../providers/home_provider.dart';
 import '../widgets/barchasb_subtitle_widget.dart';
 import '../widgets/home_scaffold_screen.dart';
@@ -28,7 +29,21 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
-
+    // گوش دادن به تغییرات استیت برای نمایش خطاها
+    ref.listen<HomeState>(homeProvider, (previous, next) {
+      // بررسی خطای sellers
+      if (next.sellers.hasError && (previous?.sellers.hasError != true)) {
+        CustomSnackBar(title: next.sellers.error.toString()).show(context);
+      }
+      // بررسی خطای employers
+      if (next.employers.hasError && (previous?.employers.hasError != true)) {
+        CustomSnackBar(title: next.employers.error.toString()).show(context);
+      }
+      // بررسی خطای jobSeekers
+      if (next.jobSeekers.hasError && (previous?.jobSeekers.hasError != true)) {
+        CustomSnackBar(title: next.jobSeekers.error.toString()).show(context);
+      }
+    });
     return HomeScaffoldScreen(
       body: RefreshIndicator(
         onRefresh: homeNotifier.fetchAll,
