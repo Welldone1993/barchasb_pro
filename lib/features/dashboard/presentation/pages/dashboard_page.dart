@@ -27,7 +27,7 @@ class DashboardPage extends ConsumerWidget {
     final List<String> buttonTitles = [
       'میزکار',
       'آگهی ها',
-      'آگهی دیجیتال',
+      'آگهی مناقصه',
       'آگهی های من',
       'اشتراک و مالی',
       'افزونه ها',

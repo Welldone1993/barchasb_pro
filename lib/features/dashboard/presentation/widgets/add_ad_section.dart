@@ -64,10 +64,10 @@ class AddAdSection extends StatelessWidget {
 
             _buildConnectorLine(),
 
-            // دکمه آگهی دیجیتال
+            // دکمه آگهی مناقصه
             _buildMenuButton(
               context,
-              title: 'آگهی دیجیتال',
+              title: 'آگهی مناقصه',
               onTap: () => context.pushReplacement('/create_digital_ad'),
             ),
           ],

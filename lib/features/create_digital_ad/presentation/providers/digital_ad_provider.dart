@@ -43,8 +43,7 @@ class DigitalAdState {
 
 class DigitalAdNotifier extends StateNotifier<DigitalAdState> {
   final Ref ref;
-  final CreateDigitalAdRepository
-  repository; // تزریق ریپازیتوری برای ارسال ریکوئست
+  final CreateDigitalAdRepository repository;
 
   DigitalAdNotifier(this.ref, this.repository) : super(DigitalAdState());
 
@@ -63,52 +62,58 @@ class DigitalAdNotifier extends StateNotifier<DigitalAdState> {
   Future<void> submitAd() async {
     state = state.copyWith(isSubmitting: true, errorMessage: null);
 
-    try {
-      // ۱. خواندن داده‌ها از پروایدرها
-      final step1 = ref.read(step1Provider);
-      final step2Skills = ref.read(step2Provider);
-      final step3 = ref.read(step3Provider);
-      final step4 = ref.read(step4Provider);
+    // ۱. خواندن داده‌ها از پروایدرها
+    final step1 = ref.read(step1Provider);
+    final step2Skills = ref.read(step2Provider);
+    final step3 = ref.read(step3Provider);
+    final step4 = ref.read(step4Provider);
 
-      // ۲. ایجاد DTO با تطبیق دقیق فیلدها
-      final dto = CreateDigitalAdRequestDto(
-        title: step1.title,
-        description: step1.description,
-        minBudget: step1.minBudget,
-        maxBudget: step1.maxBudget,
+    // ۲. ایجاد DTO با تطبیق دقیق فیلدها
+    final dto = CreateDigitalAdRequestDto(
+      title: step1.title,
+      description: step1.description,
+      minBudget: step1.minBudget,
+      maxBudget: step1.maxBudget,
 
-        // تبدیل لیست اسکیل‌ها به فرمت مورد نیاز DTO
-        requiredSkills: step2Skills
-            .map((skill) => RequiredSkillDto(name: skill))
-            .toList(),
+      // تبدیل لیست اسکیل‌ها به فرمت مورد نیاز DTO
+      requiredSkills: step2Skills
+          .map((skill) => RequiredSkillDto(name: skill))
+          .toList(),
 
-        // اطلاعات مرحله ۳
-        verifyCode: step3.verificationCode,
+      // اطلاعات مرحله ۳
+      verifyCode: step3.verificationCode,
 
-        // تبدیل Enum به String برای دیتابیس
-        paymentMethod: step4.name,
+      // تبدیل Enum به String برای دیتابیس
+      paymentMethod: step4.name,
 
-        // تصاویر (اگر فایل هستند ممکن است نیاز به FormData داشته باشید)
-        images: step1.photos.isNotEmpty ? step1.photos : null,
+      // تصاویر (اگر فایل هستند ممکن است نیاز به FormData داشته باشید)
+      images: step1.photos.isNotEmpty ? step1.photos : null,
 
-        // فیلدهای زیر در DTO شما موجود هستند اما در پروایدرهای فعلی نبودند
-        // اگر از قبل مقداری ندارند، null فرستاده می‌شوند
-        remote: null,
-        // اگر در UI دارید، از پروایدر مربوطه مقداردهی کنید
-        thursdayHalf: null,
-        // اگر در UI دارید، از پروایدر مربوطه مقداردهی کنید
-        durationUnit: null,
-        durationAmount: null,
-        requestType: 'digital_ad', // مقدار پیش‌فرض اگر لازم است
-      );
+      // فیلدهای زیر در DTO شما موجود هستند اما در پروایدرهای فعلی نبودند
+      // اگر از قبل مقداری ندارند، null فرستاده می‌شوند
+      remote: null,
+      // اگر در UI دارید، از پروایدر مربوطه مقداردهی کنید
+      thursdayHalf: null,
+      // اگر در UI دارید، از پروایدر مربوطه مقداردهی کنید
+      durationUnit: 'hour',
+      durationAmount: null,
+      requestType: 'digital_ad', // مقدار پیش‌فرض اگر لازم است
+    );
 
-      // ۳. ارسال به ریپازیتوری
-      final result = await repository.createDigitalAd(dto);
+    // ۳. ارسال به ریپازیتوری
+    final result = await repository.createDigitalAd(dto);
 
-      // ... ادامه لاجیک fold برای هندل کردن result
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, errorMessage: e.toString());
-    }
+    result.fold(
+      (error) {
+        state = state.copyWith(
+          isSubmitting: false,
+          errorMessage: error.message,
+        );
+      },
+      (r) {
+        nextStep();
+      },
+    );
   }
 }
 

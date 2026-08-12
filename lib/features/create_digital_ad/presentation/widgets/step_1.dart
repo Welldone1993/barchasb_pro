@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,9 +11,9 @@ class Step1BasicInfoScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // خواندن استیت و ناتیفایر از Riverpod
-    final digitalAdNotifier = ref.read(step1Provider.notifier);
-    final notifier = ref.read(digitalAdProvider.notifier);
+    final step1Data = ref.watch(step1Provider); // گوش دادن به تغییرات دیتا
+    final step1Notifier = ref.read(step1Provider.notifier);
+    final mainNotifier = ref.read(digitalAdProvider.notifier);
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8), // رنگ پس‌زمینه یکپارچه
       body: SafeArea(
@@ -29,9 +31,7 @@ class Step1BasicInfoScreen extends ConsumerWidget {
 
                         // بخش انتخاب عکس آگهی
                         GestureDetector(
-                          onTap: () {
-                            // TODO: باز کردن گالری برای انتخاب عکس
-                          },
+                            onTap: () => step1Notifier.pickImages(),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -44,6 +44,40 @@ class Step1BasicInfoScreen extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
+                              if (step1Data.photos.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Wrap(
+                                    spacing: 8,
+                                    children: List.generate(step1Data.photos.length, (index) {
+                                      return Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Image.file(
+                                              File(step1Data.photos[index].path),
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 0,
+                                            child: GestureDetector(
+                                              onTap: () => step1Notifier.removeImage(index),
+                                              child: CircleAvatar(
+                                                radius: 10,
+                                                backgroundColor: Colors.red,
+                                                child: Icon(Icons.close, size: 12, color: Colors.white),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    }),
+                                  ),
+                                ),
+                              if (step1Data.photos.isEmpty)
                               Container(
                                 width: 48,
                                 height: 48,
@@ -60,32 +94,33 @@ class Step1BasicInfoScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 40),
 
                         // فرم‌ها
                         _buildTextField(
                           'عنوان آگهی',
-                          (val) => digitalAdNotifier.updateField('title', val),
+                          (val) => step1Notifier.updateField('title', val),
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           'حداقل بودجه',
                           (val) =>
-                              digitalAdNotifier.updateField('minBudget', val),
+                              step1Notifier.updateField('minBudget', val),
                           isNumber: true, // کیبورد عددی
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           'حداکثر بودجه',
                           (val) =>
-                              digitalAdNotifier.updateField('maxBudget', val),
+                              step1Notifier.updateField('maxBudget', val),
                           isNumber: true, // کیبورد عددی
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
                           'توضیحات',
                           (val) =>
-                              digitalAdNotifier.updateField('description', val),
+                              step1Notifier.updateField('description', val),
                         ),
                       ],
                     ),
@@ -105,7 +140,7 @@ class Step1BasicInfoScreen extends ConsumerWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      notifier.nextStep();
+                      mainNotifier.nextStep();
                     },
                     child: const Text(
                       'مرحله بعد',

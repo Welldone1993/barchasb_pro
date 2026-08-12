@@ -5,6 +5,8 @@ import '../../../../core/network/api_endpoints.dart';
 
 abstract class CreateDigitalAdRemoteDataSource {
   Future<dynamic> createDigitalAd(CreateDigitalAdRequestDto digitalAd);
+
+  Future<dynamic> sendOtp(String phone);
 }
 
 class CreateDigitalAdRemoteDataSourceImpl
@@ -15,11 +17,24 @@ class CreateDigitalAdRemoteDataSourceImpl
 
   @override
   Future<dynamic> createDigitalAd(CreateDigitalAdRequestDto digitalAd) async {
+    final formData = await digitalAd.toFormData();
     final response = await _dio.post(
       ApiEndpoints.createDigitalAd,
-      data: digitalAd.toJson(),
-      // data: FormData.fromMap(digitalAd.toJson()),
+      data: formData,
+      options: Options(
+        contentType: 'multipart/form-data', // بازنویسی برای این درخواست خاص
+      ),
     );
+    return response;
+  }
+
+  @override
+  Future<dynamic> sendOtp(String phone) async {
+    final response = await _dio.post(
+      ApiEndpoints.sendOtp,
+      data: {'phone': phone, 'purpose': 'default'},
+    );
+
     return response;
   }
 }

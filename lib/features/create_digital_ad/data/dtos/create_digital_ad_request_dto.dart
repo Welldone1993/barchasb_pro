@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'required_skill_dto.dart';
 
 class CreateDigitalAdRequestDto {
@@ -19,12 +21,16 @@ class CreateDigitalAdRequestDto {
   final String? requestType;
   final String? durationUnit;
   final int? durationAmount;
+
+  // فیلدهای جا افتاده طبق Swagger
+  final String? province;
+  final String? city;
+  final String? phoneOther;
+
   final DateTime? approvedAt;
   final DateTime? expiresAt;
 
-  /// برای multipart/form-data:
-  /// در Flutter معمولاً Fileها مستقیم داخل DTO نگهداری نمی‌شوند،
-  /// ولی اگر بخواهی می‌توانی اینجا لیست مسیر/فایل یا Uint8List بگذاری.
+  // مسیر عکس‌ها یا فایل‌ها
   final List<dynamic>? images;
 
   const CreateDigitalAdRequestDto({
@@ -46,33 +52,80 @@ class CreateDigitalAdRequestDto {
     this.requestType,
     this.durationUnit,
     this.durationAmount,
+    this.province,
+    this.city,
+    this.phoneOther,
     this.approvedAt,
     this.expiresAt,
     this.images,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'owner': owner,
-      'title': title,
-      'description': description,
-      'digitalTotalDesc': digitalTotalDesc,
-      'projectNames': projectNames,
-      'projectDescriptions': projectDescriptions,
-      'minBudget': minBudget,
-      'maxBudget': maxBudget,
-      'requiredSkills': requiredSkills?.map((e) => e.toJson()).toList(),
-      'person': person,
-      'remote': remote,
-      'thursdayHalf': thursdayHalf,
-      'paymentMethod': paymentMethod,
-      'verifyCode': verifyCode,
-      'adStatus': adStatus,
-      'requestType': requestType,
-      'durationUnit': durationUnit,
-      'durationAmount': durationAmount,
-      'approvedAt': approvedAt?.toIso8601String(),
-      'expiresAt': expiresAt?.toIso8601String(),
-    };
+  /// این متد مخصوص ساخت FormData برای ارسال به سرور است
+  Future<FormData> toFormData() async {
+    final Map<String, dynamic> data = {};
+
+    // متد کمکی برای اضافه کردن مقادیر غیر Null به عنوان String
+    void addIfNotNull(String key, dynamic value) {
+      if (value != null && value.toString().isNotEmpty) {
+        data[key] = value.toString();
+      }
+    }
+
+    addIfNotNull('owner', owner);
+    addIfNotNull('title', title);
+    addIfNotNull('description', description);
+    addIfNotNull('digitalTotalDesc', digitalTotalDesc);
+    addIfNotNull('minBudget', minBudget);
+    addIfNotNull('maxBudget', maxBudget);
+    addIfNotNull('person', person);
+    addIfNotNull('paymentMethod', paymentMethod);
+    addIfNotNull('verifyCode', verifyCode);
+    addIfNotNull('adStatus', adStatus);
+    addIfNotNull('requestType', requestType);
+    addIfNotNull('durationUnit', durationUnit);
+    addIfNotNull('durationAmount', durationAmount);
+
+    // فیلدهای جدید
+    addIfNotNull('province', province);
+    addIfNotNull('city', city);
+    addIfNotNull('phoneOther', phoneOther);
+
+    // تبدیل بولین‌ها به String ("true" یا "false")
+    if (remote != null) data['remote'] = remote.toString();
+    if (thursdayHalf != null) data['thursdayHalf'] = thursdayHalf.toString();
+
+    // تبدیل آرایه‌ها به رشته JSON طبق داکیومنت Swagger
+    if (projectNames != null && projectNames!.isNotEmpty) {
+      data['projectNames'] = jsonEncode(projectNames);
+    }
+    if (projectDescriptions != null && projectDescriptions!.isNotEmpty) {
+      data['projectDescriptions'] = jsonEncode(projectDescriptions);
+    }
+    if (requiredSkills != null && requiredSkills!.isNotEmpty) {
+      data['requiredSkills'] = jsonEncode(requiredSkills!.map((e) => e.toJson()).toList());
+    }
+
+    if (approvedAt != null) data['approvedAt'] = approvedAt!.toIso8601String();
+    if (expiresAt != null) data['expiresAt'] = expiresAt!.toIso8601String();
+
+    // ساخت FormData از دیتاهای متنی
+    final formData = FormData.fromMap(data);
+
+    // اضافه کردن تصاویر (تبدیل مسیر فایل به MultipartFile)
+    if (images != null && images!.isNotEmpty) {
+      for (var img in images!) {
+        if (img is String) {
+          // اگر لیست شما حاوی مسیر فایل‌های String است
+          formData.files.add(
+            MapEntry('images', await MultipartFile.fromFile(img)),
+          );
+        }
+        // اگر نوع عکس‌ها XFile یا File (از dart:io) است، متد مناسب را فراخوانی کنید
+        // مثال برای فایل جاوااسکریپتی/آیو :
+        // if (img is File) formData.files.add(MapEntry('images', await MultipartFile.fromFile(img.path)));
+      }
+    }
+
+    return formData;
   }
 }

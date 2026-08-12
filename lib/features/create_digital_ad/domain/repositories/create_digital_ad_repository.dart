@@ -5,5 +5,6 @@ import '../../../../core/utils/failure.dart';
 import '../../../digital_ad/domain/entities/digital_ad_entity.dart';
 
 abstract class CreateDigitalAdRepository {
-  Future<Either<Failure, CreateDigitalAdEntity>> createDigitalAd(CreateDigitalAdRequestDto digitalAd);
+  Future<Either<Failure, dynamic>> createDigitalAd(CreateDigitalAdRequestDto digitalAd);
+  Future<Either<Failure,dynamic>> sendOtp(String phone);
 }

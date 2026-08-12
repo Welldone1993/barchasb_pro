@@ -1,10 +1,13 @@
 class ApiEndpoints {
   // Auth
-  /// user : 09966698861 - Password "Aa123456"
   static const authController = '/auth';
   static const String login = '$authController/login';
   static const String register = '$authController/register';
   static const String getUser = '$authController/me';
+
+  // OTP
+  static const otpController = '/otp';
+  static const String sendOtp = '$otpController/send';
 
   // ads
   static const adsController = '/ads';
@@ -16,8 +19,6 @@ class ApiEndpoints {
   static const String createDigitalAd = '$adsController/digital';
   static const String createEmployerAd = '$adsController/employer';
   static const String createJobseekerAd = '$adsController/jobseeker';
-
-
 
   // user-view
   static const userViewController = '/user-views';
