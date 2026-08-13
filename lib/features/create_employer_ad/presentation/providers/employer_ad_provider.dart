@@ -70,7 +70,6 @@ class EmployerAdNotifier extends StateNotifier<EmployerAdState> {
   Future<void> submitAd() async {
     state = state.copyWith(isSubmitting: true, errorMessage: null);
 
-    try {
       // ۱. خواندن داده‌ها از پروایدرها
       final step1 = ref.read(step1Provider);
       final step2 = ref.read(step2Provider);
@@ -93,7 +92,6 @@ class EmployerAdNotifier extends StateNotifier<EmployerAdState> {
           // نکته: در step1 دسته‌بندی به عنوان String ذخیره شده است.
           // باید آیدی واقعی آن را در UI ذخیره کنید یا اینجا تبدیلش کنید.
           EmployerAdCategoryDto(
-            categoryId: 1, // مقدار موقت (باید با ID واقعی جایگزین شود)
             name: step1.category, // نام دسته‌بندی
             subCategories: [],
           ),
@@ -114,9 +112,8 @@ class EmployerAdNotifier extends StateNotifier<EmployerAdState> {
         startTime: step2.startTime.isNotEmpty ? step2.startTime : null,
         endTime: step2.endTime.isNotEmpty ? step2.endTime : null,
 
-        // تبدیل رشته‌های حقوق به عدد
-        minSalary: num.tryParse(step2.minSalary),
-        maxSalary: num.tryParse(step2.maxSalary),
+        minSalary: step2.minSalary,
+        maxSalary: step2.maxSalary,
 
         // ارسال 'سایر ویژگی‌ها' به عنوان جزئیات شغل (JobDetails)
         jobDetails: step2.otherFeatures.isNotEmpty
@@ -140,11 +137,18 @@ class EmployerAdNotifier extends StateNotifier<EmployerAdState> {
       );
       // ۳. ارسال به ریپازیتوری
       final result = await repository.createEmployerAd(dto);
+      result.fold(
+            (error) {
+          state = state.copyWith(
+            isSubmitting: false,
+            errorMessage: error.message,
+          );
+        },
+            (r) {
+          nextStep();
+        },
+      );
 
-      // ... ادامه لاجیک fold برای هندل کردن result
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, errorMessage: e.toString());
-    }
   }
 }
 

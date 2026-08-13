@@ -12,11 +12,22 @@ class CreateSellerAdRepositoryImpl extends CreateSellerAdRepository {
   CreateSellerAdRepositoryImpl(this._remote);
 
   @override
-  Future<Either<Failure, CreateSellerAdEntity>> createSellerAd(
+  Future<Either<Failure, dynamic>> createSellerAd(
     CreateSellerAdDto employerAd,
   ) async {
     try {
       final dynamic result = await _remote.createSellerAd(employerAd);
+
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure(e.message ?? 'خطا در دریافت اطلاعات از سرور'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, dynamic>> sendOtp(String phone) async {
+    try {
+      final dynamic result = await _remote.sendOtp(phone);
 
       return Right(result);
     } on ServerException catch (e) {

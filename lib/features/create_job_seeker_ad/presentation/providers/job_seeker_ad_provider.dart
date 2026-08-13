@@ -62,41 +62,49 @@ class JobSeekerAdNotifier extends StateNotifier<JobSeekerAdState> {
   Future<void> submitAd() async {
     state = state.copyWith(isSubmitting: true, errorMessage: null);
 
-    try {
-      // ۱. خواندن داده‌ها از پروایدرها
-      final step1 = ref.read(step1Provider);
-      final step2 = ref.read(step2Provider);
-      final step3 = ref.read(step3Provider);
-      final step4 = ref.read(step4Provider);
+    // ۱. خواندن داده‌ها از پروایدرها
+    final step1 = ref.read(step1Provider);
+    final step2 = ref.read(step2Provider);
+    final step3 = ref.read(step3Provider);
+    final step4 = ref.read(step4Provider);
 
-      // ۴. پر کردن DTO با داده‌های جمع‌آوری شده
+    // ۴. پر کردن DTO با داده‌های جمع‌آوری شده
 
-      final dto = CreateJobSeekerAdRequestDto(
-        name: step1.name.isNotEmpty ? step1.name : null,
-        age: int.tryParse(step1.age),
-        gender: step2.gender.isNotEmpty ? step2.gender : null,
-        phoneNumber: step2.phoneNumber.isNotEmpty ? step2.phoneNumber : null,
-        state: step2.province.isNotEmpty ? step2.province : null,
-        // در استپ ۲ نامش province است
-        city: step2.city.isNotEmpty ? step2.city : null,
+    final dto = CreateJobSeekerAdRequestDto(
+      name: step1.name.isNotEmpty ? step1.name : null,
+      age: int.tryParse(step1.age),
+      gender: step2.gender.isNotEmpty ? step2.gender : null,
+      phoneNumber: step2.phoneNumber.isNotEmpty ? step2.phoneNumber : null,
+      state: step2.province.isNotEmpty ? step2.province : null,
+      // در استپ ۲ نامش province است
+      city: step2.city.isNotEmpty ? step2.city : null,
 
-        // مقادیری که در استپ‌ها وجود ندارند و طبق درخواست شما null گذاشته می‌شوند:
-        category: null,
-        skills: null,
+      // مقادیری که در استپ‌ها وجود ندارند و طبق درخواست شما null گذاشته می‌شوند:
+      category: null,
+      skills: [],
 
-        suggestedSalaryIRT: num.tryParse(step1.suggestedSalary),
-        aboutMe: step2.aboutMe.isNotEmpty ? step2.aboutMe : null,
+      suggestedSalaryIRT: num.tryParse(step1.suggestedSalary),
+      aboutMe: step2.aboutMe.isNotEmpty ? step2.aboutMe : null,
 
-        // تبدیل تک‌عکس استپ ۱ به لیستِ تصاویر برای DTO
-        images: step1.imagePath != null ? [step1.imagePath!] : null,
-      );
-      // ۳. ارسال به ریپازیتوری
-      final result = await repository.createJobSeekerAd(dto);
+      // تبدیل تک‌عکس استپ ۱ به لیستِ تصاویر برای DTO
+      // images: step1.imagePath != null ? [step1.imagePath!] : null,
 
-      // ... ادامه لاجیک fold برای هندل کردن result
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, errorMessage: e.toString());
-    }
+    );
+    // ۳. ارسال به ریپازیتوری
+    final result = await repository.createJobSeekerAd(dto);
+
+    // ... ادامه لاجیک fold برای هندل کردن result
+    result.fold(
+      (error) {
+        state = state.copyWith(
+          isSubmitting: false,
+          errorMessage: error.message,
+        );
+      },
+      (r) {
+        nextStep();
+      },
+    );
   }
 }
 

@@ -1,14 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
-
 import 'employer_ad_category_dto.dart';
 import 'job_detail_dto.dart';
 
 class CreateEmployerAdRequestDto {
+  final List<String> images; // مسیر (Path) عکس‌ها در فلاتر
+
   final String name;
   final String title;
-  final List<String> images; // مسیر فایل‌های گوشی
-  final List<EmployerAdCategoryDto> categories;
+
+  final List<EmployerAdCategoryDto>? categories;
+
   final String? state;
   final String? city;
   final String? cooperationType;
@@ -20,26 +23,30 @@ class CreateEmployerAdRequestDto {
   final bool? thursdayUntilNoon;
   final String? startTime;
   final String? endTime;
-  final num? minSalary;
-  final num? maxSalary;
+  final String? minSalary;
+  final String? maxSalary;
+
   final String? companyName;
   final String? companyType;
   final String? benefits;
-  final bool? insurance;
+  final String? insurance;
   final String? education;
   final String? companyDescription;
-  final List<JobDetailDto> jobDetails;
+
+  final List<JobDetailDto>? jobDetails;
+
   final String? person;
   final bool? isVerified;
   final bool? enableChat;
   final bool? enablePhone;
+  final String? adPaymentMethod;
+  final String? adStatus;
 
   CreateEmployerAdRequestDto({
+    required this.images,
     required this.name,
     required this.title,
-    required this.images,
-    required this.categories,
-    required this.jobDetails,
+    this.categories,
     this.state,
     this.city,
     this.cooperationType,
@@ -59,62 +66,72 @@ class CreateEmployerAdRequestDto {
     this.insurance,
     this.education,
     this.companyDescription,
+    this.jobDetails,
     this.person,
     this.isVerified,
     this.enableChat,
     this.enablePhone,
+    this.adPaymentMethod,
+    this.adStatus,
   });
 
-  /// تبدیل مدل به FormData برای ارسال به بک‌اند از طریق Dio
+  /// تبدیل تمام فیلدها به فرمت `FormData` برای ارسال در ریکوئست `multipart/form-data`
   Future<FormData> toFormData() async {
-    final Map<String, dynamic> mapData = {
+    Map<String, dynamic> formMap = {
       'name': name,
       'title': title,
-
-      // در فرم‌دیتا مقادیر پیچیده مثل لیست کلاس‌ها باید استرینگ (JSON) شوند
-      'categories': jsonEncode(categories.map((e) => e.toJson()).toList()),
-      'jobDetails': jsonEncode(jobDetails.map((e) => e.toJson()).toList()),
-
-      if (state != null) 'state': state,
-      if (city != null) 'city': city,
-      if (cooperationType != null) 'cooperationType': cooperationType,
-      if (gender != null) 'gender': gender,
-      if (militaryStatus != null) 'militaryStatus': militaryStatus,
-      if (experience != null) 'experience': experience,
-      if (paymentMethod != null) 'paymentMethod': paymentMethod,
-
-      // بولین‌ها در FormData بک‌اند nodejs معمولا به صورت استرینگ مدیریت می‌شوند
-      if (isRemote != null) 'isRemote': isRemote.toString(),
-      if (thursdayUntilNoon != null)
-        'thursdayUntilNoon': thursdayUntilNoon.toString(),
-      if (insurance != null) 'insurance': insurance.toString(),
-      if (isVerified != null) 'isVerified': isVerified.toString(),
-      if (enableChat != null) 'enableChat': enableChat.toString(),
-      if (enablePhone != null) 'enablePhone': enablePhone.toString(),
-
-      if (startTime != null) 'startTime': startTime,
-      if (endTime != null) 'endTime': endTime,
-      if (minSalary != null) 'minSalary': minSalary.toString(),
-      if (maxSalary != null) 'maxSalary': maxSalary.toString(),
-      if (companyName != null) 'companyName': companyName,
-      if (companyType != null) 'companyType': companyType,
-      if (benefits != null) 'benefits': benefits,
-      if (education != null) 'education': education,
-      if (companyDescription != null) 'companyDescription': companyDescription,
-      if (person != null) 'person': person,
     };
 
-    final formData = FormData.fromMap(mapData);
+    // لیست آبجکت‌ها باید به صورت JSON String ارسال شوند
+    if (categories != null && categories!.isNotEmpty) {
+      formMap['categories'] = jsonEncode(categories!.map((e) => e.toJson()).toList());
+    }
+    if (jobDetails != null && jobDetails!.isNotEmpty) {
+      formMap['jobDetails'] = jsonEncode(jobDetails!.map((e) => e.toJson()).toList());
+    }
+
+    // فیلدهای Optional (String و Bool)
+    if (state != null) formMap['state'] = state;
+    if (city != null) formMap['city'] = city;
+    if (cooperationType != null) formMap['cooperationType'] = cooperationType;
+    if (gender != null) formMap['gender'] = gender;
+    if (militaryStatus != null) formMap['militaryStatus'] = militaryStatus;
+    if (experience != null) formMap['experience'] = experience;
+    if (paymentMethod != null) formMap['paymentMethod'] = paymentMethod;
+    if (isRemote != null) formMap['isRemote'] = isRemote.toString();
+    if (thursdayUntilNoon != null) formMap['thursdayUntilNoon'] = thursdayUntilNoon.toString();
+    if (startTime != null) formMap['startTime'] = startTime;
+    if (endTime != null) formMap['endTime'] = endTime;
+    if (minSalary != null) formMap['minSalary'] = minSalary;
+    if (maxSalary != null) formMap['maxSalary'] = maxSalary;
+
+    if (companyName != null) formMap['companyName'] = companyName;
+    if (companyType != null) formMap['companyType'] = companyType;
+    if (benefits != null) formMap['benefits'] = benefits;
+    if (insurance != null) formMap['insurance'] = insurance;
+    if (education != null) formMap['education'] = education;
+    if (companyDescription != null) formMap['companyDescription'] = companyDescription;
+
+    if (person != null) formMap['person'] = person;
+    if (isVerified != null) formMap['isVerified'] = isVerified.toString();
+    if (enableChat != null) formMap['enableChat'] = enableChat.toString();
+    if (enablePhone != null) formMap['enablePhone'] = enablePhone.toString();
+    if (adPaymentMethod != null) formMap['adPaymentMethod'] = adPaymentMethod;
+    if (adStatus != null) formMap['adStatus'] = adStatus;
+
+    FormData formData = FormData.fromMap(formMap);
 
     // افزودن تصاویر به FormData
-    for (var imagePath in images) {
-      formData.files.add(
-        MapEntry(
-          'images',
-          // این کلید دقیقاً باید با نامی که در بک‌انده (images) مچ باشد
-          await MultipartFile.fromFile(imagePath),
-        ),
-      );
+    if (images.isNotEmpty) {
+      for (var imagePath in images) {
+        formData.files.add(MapEntry(
+          'images', // این کلید باید با نامی که بک‌اند انتظار دارد (images) دقیقا یکی باشد
+          await MultipartFile.fromFile(
+            imagePath,
+            filename: imagePath.split('/').last,
+          ),
+        ));
+      }
     }
 
     return formData;

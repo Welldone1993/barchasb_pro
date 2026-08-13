@@ -7,7 +7,9 @@ import '../../data/dtos/create_employer_ad_dto.dart';
 import '../entities/create_employer_ad_entity.dart';
 
 abstract class CreateEmployerAdRepository {
-  Future<Either<Failure, CreateEmployerAdEntity>> createEmployerAd(
+  Future<Either<Failure, dynamic>> createEmployerAd(
     CreateEmployerAdRequestDto employerAd,
   );
+
+  Future<Either<Failure, dynamic>> sendOtp(String phone);
 }

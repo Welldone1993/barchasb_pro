@@ -62,72 +62,78 @@ class SellerAdNotifier extends StateNotifier<SellerAdState> {
   Future<void> submitAd() async {
     state = state.copyWith(isSubmitting: true, errorMessage: null);
 
-    try {
-      // ۱. خواندن داده‌ها از پروایدرها
-      final step1 = ref.read(step1Provider);
-      final step2 = ref.read(step2Provider);
-      final step3 = ref.read(step3Provider);
-      final step4 = ref.read(step4Provider);
+    // ۱. خواندن داده‌ها از پروایدرها
+    final step1 = ref.read(step1Provider);
+    final step2 = ref.read(step2Provider);
+    final step3 = ref.read(step3Provider);
+    final step4 = ref.read(step4Provider);
 
-      // ۴. پر کردن DTO با داده‌های جمع‌آوری شده
-      // تجمیع فیلدهایی که در دیتابیس ستون اختصاصی ندارند داخل یک مپ
-      final extraFeatures = <String, dynamic>{
-        if (step1.description.isNotEmpty) 'description': step1.description,
+    // ۴. پر کردن DTO با داده‌های جمع‌آوری شده
+    // تجمیع فیلدهایی که در دیتابیس ستون اختصاصی ندارند داخل یک مپ
+    final extraFeatures = <String, dynamic>{
+      if (step1.description.isNotEmpty) 'description': step1.description,
 
-        // ویژگی‌های مرحله دوم
-        if (step2.condition.isNotEmpty) 'condition': step2.condition,
-        if (step2.usage.isNotEmpty) 'usage': step2.usage,
-        if (step2.toolType.isNotEmpty) 'toolType': step2.toolType,
-        if (step2.brand.isNotEmpty) 'brand': step2.brand,
-        if (step2.model.isNotEmpty) 'model': step2.model,
-        if (step2.power.isNotEmpty) 'power': step2.power,
-        if (step2.technicalSpecs.isNotEmpty)
-          'technicalSpecs': step2.technicalSpecs,
-        if (step2.includedItems.isNotEmpty)
-          'includedItems': step2.includedItems,
-        if (step2.warrantyMonths.isNotEmpty)
-          'warrantyMonths': step2.warrantyMonths,
+      // ویژگی‌های مرحله دوم
+      if (step2.condition.isNotEmpty) 'condition': step2.condition,
+      if (step2.usage.isNotEmpty) 'usage': step2.usage,
+      if (step2.toolType.isNotEmpty) 'toolType': step2.toolType,
+      if (step2.brand.isNotEmpty) 'brand': step2.brand,
+      if (step2.model.isNotEmpty) 'model': step2.model,
+      if (step2.power.isNotEmpty) 'power': step2.power,
+      if (step2.technicalSpecs.isNotEmpty)
+        'technicalSpecs': step2.technicalSpecs,
+      if (step2.includedItems.isNotEmpty) 'includedItems': step2.includedItems,
+      if (step2.warrantyMonths.isNotEmpty)
+        'warrantyMonths': step2.warrantyMonths,
 
-        // تنظیمات تماس از مرحله سوم
-        'verificationCode': step3.verificationCode,
-        'isChatEnabled': step3.isChatEnabled,
-        'isCallEnabled': step3.isCallEnabled,
-      };
+      // تنظیمات تماس از مرحله سوم
+      'verificationCode': step3.verificationCode,
+      'isChatEnabled': step3.isChatEnabled,
+      'isCallEnabled': step3.isCallEnabled,
+    };
 
-      final dto = CreateSellerAdDto(
-        // مقادیر مرحله ۱
-        title: step1.title.isNotEmpty ? step1.title : null,
-        category: step1.category.isNotEmpty ? step1.category : null,
-        images: step1.imagePaths.isNotEmpty ? step1.imagePaths : null,
-        mainImageIndex: step1.imagePaths.isNotEmpty ? 0 : null,
-        // پیش‌فرض عکس اول
+    final dto = CreateSellerAdDto(
+      // مقادیر مرحله ۱
+      title: step1.title.isNotEmpty ? step1.title : null,
+      category: step1.category.isNotEmpty ? step1.category : null,
+      images: step1.imagePaths.isNotEmpty ? step1.imagePaths : null,
+      mainImageIndex: step1.imagePaths.isNotEmpty ? 0 : null,
+      // پیش‌فرض عکس اول
 
-        // مقادیر مرحله ۲
-        state: step2.province.isNotEmpty ? step2.province : null,
-        city: step2.city.isNotEmpty ? step2.city : null,
-        priceIRT: num.tryParse(step2.price),
-        // تبدیل رشته به عدد
-        isFixedPrice: step2.isFixedPrice,
-        isNegotiable: step2.isExchangeable,
-        // isExchangeable نقش همان قابل مذاکره/معاوضه را دارد
-        hasWarranty: step2.hasWarranty,
-        isShippable: step2.canShip,
+      // مقادیر مرحله ۲
+      state: step2.province.isNotEmpty ? step2.province : null,
+      city: step2.city.isNotEmpty ? step2.city : null,
+      priceIRT: num.tryParse(step2.price),
+      // تبدیل رشته به عدد
+      isFixedPrice: step2.isFixedPrice,
+      isNegotiable: step2.isExchangeable,
+      // isExchangeable نقش همان قابل مذاکره/معاوضه را دارد
+      hasWarranty: step2.hasWarranty,
+      isShippable: step2.canShip,
 
-        // مقادیر مرحله ۳ و اضافی
-        extraFeatures: extraFeatures.isNotEmpty ? extraFeatures : null,
-        person: null,
-        // اگر شخص/شرکت بودن در استیت‌ها وجود ندارد نال ارسال می‌کنیم
+      // مقادیر مرحله ۳ و اضافی
+      extraFeatures: extraFeatures.isNotEmpty ? extraFeatures : null,
+      person: null,
+      // اگر شخص/شرکت بودن در استیت‌ها وجود ندارد نال ارسال می‌کنیم
 
-        // مقادیر مرحله ۴ (تبدیل Enum به رشته)
-        paymentMethod: step4.name,
-      );
-      // ۳. ارسال به ریپازیتوری
-      final result = await repository.createSellerAd(dto);
+      // مقادیر مرحله ۴ (تبدیل Enum به رشته)
+      paymentMethod: step4.name,
+    );
+    // ۳. ارسال به ریپازیتوری
+    final result = await repository.createSellerAd(dto);
 
-      // ... ادامه لاجیک fold برای هندل کردن result
-    } catch (e) {
-      state = state.copyWith(isSubmitting: false, errorMessage: e.toString());
-    }
+    // ... ادامه لاجیک fold برای هندل کردن result
+    result.fold(
+      (error) {
+        state = state.copyWith(
+          isSubmitting: false,
+          errorMessage: error.message,
+        );
+      },
+      (r) {
+        nextStep();
+      },
+    );
   }
 }
 

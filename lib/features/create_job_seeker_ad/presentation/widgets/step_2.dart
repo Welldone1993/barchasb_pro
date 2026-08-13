@@ -227,7 +227,7 @@ class Step2JobInfoScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => notifier.nextStep(),
+                      onPressed: () => notifier.prevStep(),
                       child: const Text(
                         'مرحله قبل',
                         style: TextStyle(color: Colors.white, fontSize: 16),

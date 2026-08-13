@@ -5,6 +5,8 @@ import '../dtos/create_employer_ad_dto.dart';
 
 abstract class CreateEmployerAdRemoteDataSource {
   Future<dynamic> createEmployerAd(CreateEmployerAdRequestDto employerAd);
+
+  Future<dynamic> sendOtp(String phone);
 }
 
 class CreateEmployerAdRemoteDataSourceImpl
@@ -17,10 +19,24 @@ class CreateEmployerAdRemoteDataSourceImpl
   Future<dynamic> createEmployerAd(
     CreateEmployerAdRequestDto employerAd,
   ) async {
+    final formData = await employerAd.toFormData();
     final response = await _dio.post(
       ApiEndpoints.createEmployerAd,
-      data: employerAd.toFormData(),
+      data: formData,
+      options: Options(
+        contentType: 'multipart/form-data', // بازنویسی برای این درخواست خاص
+      ),
     );
+    return response;
+  }
+
+  @override
+  Future<dynamic> sendOtp(String phone) async {
+    final response = await _dio.post(
+      ApiEndpoints.sendOtp,
+      data: {'phone': phone, 'purpose': 'default'},
+    );
+
     return response;
   }
 }

@@ -11,7 +11,6 @@ class Step3VerificationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formData = ref.watch(step3Provider);
     final notifier = ref.read(jobSeekerAdProvider.notifier);
-    const String phoneNumber = "09035733634"; // TODO: دریافت از پروایدر یا API
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
@@ -23,8 +22,8 @@ class Step3VerificationScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // متن راهنما
-            const Text(
-              'تائید شماره ی $phoneNumber با کد پیامک',
+            Text(
+              'تائید شماره ی ${formData.phoneNumber} با کد پیامک',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.blueGrey,
@@ -68,7 +67,9 @@ class Step3VerificationScreen extends ConsumerWidget {
                     ),
                   ),
                   onPressed: () {
-                    // TODO: فراخوانی متد ارسال یا بررسی مجدد کد پیامک
+                    ref
+                        .read(step3Provider.notifier)
+                        .sendOtp(context,formData.phoneNumber);
                   },
                   child: const Text(
                     'ارسال کد',
