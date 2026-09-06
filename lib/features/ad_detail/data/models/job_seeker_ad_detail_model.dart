@@ -1,4 +1,9 @@
+import '../../domain/entities/ad_image_entity.dart';
+import '../../domain/entities/career_history_entity.dart';
+import '../../domain/entities/enhancement_entity.dart';
 import '../../domain/entities/job_seeker_ad_detail_entity.dart';
+import '../../domain/entities/owner_entity.dart';
+import '../../domain/entities/rating_entity.dart';
 
 class JobSeekerAdDetailModel extends JobSeekerAdDetailEntity {
   const JobSeekerAdDetailModel({

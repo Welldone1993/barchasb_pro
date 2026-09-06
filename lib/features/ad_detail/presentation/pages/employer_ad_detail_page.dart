@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/job_seeker_ad_detail_provider.dart';
 
-class JobSeekerAdDetailPage extends ConsumerWidget {
+import '../providers/employer_ad_detail_provider.dart';
+
+class EmployerAdDetailPage extends ConsumerWidget {
   final String adId;
 
-  const JobSeekerAdDetailPage({
-    super.key,
-    required this.adId,
-  });
+  const EmployerAdDetailPage({super.key, required this.adId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // گوش دادن به وضعیت آگهی بر اساس شناسه
-    final adDetailAsync = ref.watch(jobSeekerAdDetailProvider(adId));
+    final adDetailAsync = ref.watch(employerAdDetailProvider(adId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('جزئیات آگهی کارجو'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('جزئیات آگهی'), centerTitle: true),
       body: adDetailAsync.when(
         // حالت لودینگ
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
 
         // حالت خطا همراه با دکمه تلاش مجدد
         error: (error, stackTrace) => Center(
@@ -42,16 +35,13 @@ class JobSeekerAdDetailPage extends ConsumerWidget {
                 Text(
                   error.toString().replaceFirst('Exception: ', ''),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
                     // ریفرش و تلاش مجدد برای دریافت اطلاعات
-                    ref.refresh(jobSeekerAdDetailProvider(adId));
+                    ref.refresh(employerAdDetailProvider(adId));
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text('تلاش مجدد'),
@@ -73,7 +63,7 @@ class JobSeekerAdDetailPage extends ConsumerWidget {
         // حالت موفقیت‌آمیز (نمایش داده‌ها)
         data: (ad) => RefreshIndicator(
           onRefresh: () async {
-            return ref.refresh(jobSeekerAdDetailProvider(adId).future);
+            return ref.refresh(employerAdDetailProvider(adId).future);
           },
           child: ListView(
             padding: const EdgeInsets.all(16.0),
@@ -86,17 +76,19 @@ class JobSeekerAdDetailPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text('دسته‌بندی: ${ad.category}'),
               Text('استان / شهر: ${ad.state} - ${ad.city}'),
-              Text('شماره تماس: ${ad.phoneNumber}'),
-              Text('حقوق پیشنهادی: ${ad.suggestedSalaryIRT} تومان'),
+              Text('شماره تماس: ${ad.owner?.phoneNumber}'),
               const Divider(height: 32),
               const Text(
                 'درباره من:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              Text(ad.aboutMe.isNotEmpty ? ad.aboutMe : 'توضیحاتی ثبت نشده است.'),
+              Text(
+                ad.companyDescription.isNotEmpty
+                    ? ad.companyDescription
+                    : 'توضیحاتی ثبت نشده است.',
+              ),
             ],
           ),
         ),

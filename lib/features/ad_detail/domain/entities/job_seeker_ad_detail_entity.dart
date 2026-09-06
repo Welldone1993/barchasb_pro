@@ -1,3 +1,9 @@
+import 'ad_image_entity.dart';
+import 'career_history_entity.dart';
+import 'enhancement_entity.dart';
+import 'owner_entity.dart';
+import 'rating_entity.dart';
+
 class JobSeekerAdDetailEntity {
   final String id;
   final OwnerEntity? owner;
@@ -71,54 +77,5 @@ class JobSeekerAdDetailEntity {
     this.expiresAt,
     required this.isPaid,
     this.enhancements,
-  });
-}
-
-class OwnerEntity {
-  final String? id;
-  final String fullName;
-  final String phoneNumber;
-
-  const OwnerEntity({
-    this.id,
-    required this.fullName,
-    required this.phoneNumber,
-  });
-}
-
-class AdImageEntity {
-  final String url;
-  final bool isMain;
-
-  const AdImageEntity({required this.url, required this.isMain});
-}
-
-class RatingEntity {
-  final int count;
-  final double average;
-
-  const RatingEntity({required this.count, required this.average});
-}
-
-class CareerHistoryEntity {
-  final String title;
-  final String description;
-
-  const CareerHistoryEntity({required this.title, required this.description});
-}
-
-class EnhancementsEntity {
-  final bool isSpecial;
-  final DateTime? specialStartDate;
-  final DateTime? specialEndDate;
-  final bool isLadder;
-  final List<dynamic> ladders;
-
-  const EnhancementsEntity({
-    required this.isSpecial,
-    this.specialStartDate,
-    this.specialEndDate,
-    required this.isLadder,
-    this.ladders = const [],
   });
 }
