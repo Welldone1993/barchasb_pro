@@ -1,4 +1,3 @@
-// lib/features/home/presentation/widgets/horizontal_list_view_handler.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,12 +8,14 @@ class HorizontalListViewHandler extends StatelessWidget {
   final String title;
   final AsyncValue<List<AdEntity>> state;
   final VoidCallback onRetry;
+  final Function(String id) onDetailsTap;
 
   const HorizontalListViewHandler({
     super.key,
     required this.title,
     required this.state,
     required this.onRetry,
+    required this.onDetailsTap,
   });
 
   @override
@@ -28,7 +29,6 @@ class HorizontalListViewHandler extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title, style: Theme.of(context).textTheme.headlineSmall),
-              TextButton(onPressed: () {}, child: const Text('مشاهده همه')),
             ],
           ),
         ),
@@ -41,8 +41,10 @@ class HorizontalListViewHandler extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: list.length,
-                    itemBuilder: (context, index) =>
-                        HorizontalAdCard(ad: list[index]),
+                    itemBuilder: (context, index) => HorizontalAdCard(
+                      ad: list[index],
+                      onDetailsTap: onDetailsTap,
+                    ),
                   ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Center(

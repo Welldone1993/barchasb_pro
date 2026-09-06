@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/ad_detail/presentation/pages/job_seeker_ad_detail_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/create_digital_ad/presentation/pages/create_digital_ad_screen.dart';
@@ -55,6 +56,13 @@ class AppRouter {
       GoRoute(
         path: '/ticket',
         builder: (context, state) => const TicketScreen(),
+      ),
+      GoRoute(
+        path: '/job_seeker_ad_detail',
+        builder: (context, state) {
+          final adId = state.pathParameters['id'] ?? '';
+          return JobSeekerAdDetailPage(adId: adId);
+        },
       ),
     ],
   );

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/comming_soon_snack_bar.dart';
 import '../providers/home_provider.dart';
@@ -62,6 +63,7 @@ class HomePage extends ConsumerWidget {
                 title: 'فروشندگان',
                 state: homeState.sellers,
                 onRetry: homeNotifier.fetchSellers,
+                onDetailsTap: (id) => context.push('/seller_ad_detail/$id'),
               ),
             ),
 
@@ -72,6 +74,7 @@ class HomePage extends ConsumerWidget {
                 title: 'کارفرمایان',
                 state: homeState.employers,
                 onRetry: homeNotifier.fetchEmployers,
+                onDetailsTap: (id) => context.push('/employer_ad_detail/$id'),
               ),
             ),
 
@@ -82,6 +85,7 @@ class HomePage extends ConsumerWidget {
                 title: 'کارجویان',
                 state: homeState.jobSeekers,
                 onRetry: homeNotifier.fetchJobSeekers,
+                onDetailsTap: (id) => context.push('/job_seeker_ad_detail/$id'),
               ),
             ),
 
