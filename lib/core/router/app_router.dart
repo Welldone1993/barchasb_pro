@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/ad_detail/presentation/pages/digital_ad_detail_page.dart';
 import '../../features/ad_detail/presentation/pages/employer_ad_detail_page.dart';
 import '../../features/ad_detail/presentation/pages/job_seeker_ad_detail_page.dart';
+import '../../features/ad_detail/presentation/pages/seller_ad_detail_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/create_digital_ad/presentation/pages/create_digital_ad_screen.dart';
@@ -65,12 +67,23 @@ class AppRouter {
           return JobSeekerAdDetailPage(adId: adId);
         },
       ),
-
       GoRoute(
         path: '/employer_ad_detail',
         builder: (context, state) {
           final adId = state.pathParameters['id'] ?? '';
           return EmployerAdDetailPage(adId: adId);
+        },
+      ),GoRoute(
+        path: '/digital_ad_detail',
+        builder: (context, state) {
+          final adId = state.pathParameters['id'] ?? '';
+          return DigitalAdDetailPage(adId: adId);
+        },
+      ),GoRoute(
+        path: '/seller_ad_detail',
+        builder: (context, state) {
+          final adId = state.pathParameters['id'] ?? '';
+          return SellerAdDetailPage(adId: adId);
         },
       ),
     ],
