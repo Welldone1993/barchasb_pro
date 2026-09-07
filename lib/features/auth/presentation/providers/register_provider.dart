@@ -1,4 +1,3 @@
-import 'package:barchasb/features/auth/domain/entities/province_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,6 +8,7 @@ import '../../../../core/widgets/comming_soon_snack_bar.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/login_entity.dart';
+import '../../domain/entities/province_entity.dart';
 import '../../domain/entities/register_entity.dart';
 import '../../domain/entities/user_entity.dart';
 

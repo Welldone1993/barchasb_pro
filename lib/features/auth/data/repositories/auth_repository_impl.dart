@@ -1,8 +1,8 @@
-import 'package:barchasb/features/auth/domain/entities/province_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/utils/failure.dart';
 import '../../domain/entities/login_entity.dart';
+import '../../domain/entities/province_entity.dart';
 import '../../domain/entities/register_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';

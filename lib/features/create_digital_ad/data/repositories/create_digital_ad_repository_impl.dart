@@ -1,8 +1,6 @@
-import 'package:barchasb/core/utils/failure.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../../digital_ad/domain/entities/digital_ad_entity.dart';
-
+import '../../../../core/utils/failure.dart';
 import '../../domain/repositories/create_digital_ad_repository.dart';
 import '../datasources/create_digital_ad_remote_data_source.dart';
 import '../dtos/create_digital_ad_request_dto.dart';

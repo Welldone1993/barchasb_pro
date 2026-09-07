@@ -1,6 +1,3 @@
-import 'package:barchasb/core/widgets/comming_soon_snack_bar.dart';
-import 'package:barchasb/features/auth/domain/entities/province_entity.dart';
-import 'package:barchasb/features/auth/presentation/providers/register_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +8,10 @@ import '../../../../core/widgets/app_back_button.dart';
 import '../../../../core/widgets/app_elevated_button.dart';
 import '../../../../core/widgets/app_text_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/comming_soon_snack_bar.dart';
+import '../../domain/entities/province_entity.dart';
 import '../../domain/entities/register_entity.dart';
+import '../providers/register_provider.dart';
 import '../widgets/security_verification_dialog.dart';
 
 enum Gender { male, female }

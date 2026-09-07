@@ -1,9 +1,9 @@
-import 'package:barchasb/features/ads/domain/entities/employer_ad_entity.dart';
-import 'package:barchasb/features/ads/domain/entities/seller_ad_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/utils/failure.dart';
+import '../../domain/entities/employer_ad_entity.dart';
 import '../../domain/entities/job_seeker_ad_entity.dart';
+import '../../domain/entities/seller_ad_entity.dart';
 import '../../domain/repositories/ads_repository.dart';
 import '../datasource/ads_remote_data_source.dart';
 

@@ -1,4 +1,5 @@
-import 'package:barchasb/features/auth/domain/entities/province_entity.dart';
+
+import '../../domain/entities/province_entity.dart';
 
 class ProvinceModel extends ProvinceEntity {
   ProvinceModel({

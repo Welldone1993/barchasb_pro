@@ -1,6 +1,7 @@
-import 'package:barchasb/features/home/presentation/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers/home_provider.dart';
 
 class CustomSearchBar extends ConsumerStatefulWidget {
   const CustomSearchBar({super.key});

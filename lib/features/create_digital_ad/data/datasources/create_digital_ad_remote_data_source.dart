@@ -1,7 +1,7 @@
-import 'package:barchasb/features/create_digital_ad/data/dtos/create_digital_ad_request_dto.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
+import '../dtos/create_digital_ad_request_dto.dart';
 
 abstract class CreateDigitalAdRemoteDataSource {
   Future<dynamic> createDigitalAd(CreateDigitalAdRequestDto digitalAd);

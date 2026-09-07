@@ -1,7 +1,6 @@
-import 'package:barchasb/core/utils/failure.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../domain/entities/create_seller_ad_entity.dart';
+import '../../../../core/utils/failure.dart';
 import '../../domain/repositories/create_seller_ad_repository.dart';
 import '../datasources/create_seller_ad_remote_data_source.dart';
 import '../dtos/create_seller_ad_dto.dart';

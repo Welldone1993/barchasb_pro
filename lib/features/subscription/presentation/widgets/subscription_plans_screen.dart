@@ -1,5 +1,6 @@
-import 'package:barchasb/core/widgets/comming_soon_snack_bar.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/widgets/comming_soon_snack_bar.dart';
 
 class SubscriptionPlansCard extends StatelessWidget {
   const SubscriptionPlansCard({super.key});
@@ -78,7 +79,6 @@ class SubscriptionPlansCard extends StatelessWidget {
                 ),
               ),
             ),
-
           ],
         ),
       ),

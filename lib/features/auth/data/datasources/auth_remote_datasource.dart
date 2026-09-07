@@ -1,11 +1,10 @@
-import 'package:barchasb/features/auth/data/models/province_model.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../../core/network/api_endpoints.dart';
 import '../models/login_request_model.dart';
 import '../models/login_response_model.dart';
+import '../models/province_model.dart';
 import '../models/register_request_model.dart';
-import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<LoginResponseModel> login(LoginRequestModel model);
