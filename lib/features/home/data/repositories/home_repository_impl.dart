@@ -11,23 +11,25 @@ class HomeRepositoryImpl implements HomeRepository {
   HomeRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Either<Failure, List<AdEntity>>> getSellers() async =>
-      _repoCall(_remoteDataSource.getSellers);
+  Future<Either<Failure, List<AdEntity>>> getSellers({String? query}) async =>
+      _repoCall(_remoteDataSource.getSellers, query);
 
   @override
-  Future<Either<Failure, List<AdEntity>>> getEmployers() async =>
-      _repoCall(_remoteDataSource.getEmployers);
+  Future<Either<Failure, List<AdEntity>>> getEmployers({String? query}) async =>
+      _repoCall(_remoteDataSource.getEmployers, query);
 
   @override
-  Future<Either<Failure, List<AdEntity>>> getJobSeekers() async =>
-      _repoCall(_remoteDataSource.getJobSeekers);
+  Future<Either<Failure, List<AdEntity>>> getJobSeekers({
+    String? query,
+  }) async => _repoCall(_remoteDataSource.getJobSeekers, query);
 
   // یک تابع کمکی برای کاهش تکرار کد
   Future<Either<Failure, List<AdEntity>>> _repoCall(
-    Future<List<AdEntity>> Function() call,
+    Future<List<AdEntity>> Function(String? query) call,
+    String? query,
   ) async {
     try {
-      final result = await call();
+      final result = await call(query);
       return right(result);
     } on DioException catch (e) {
       return left(Failure(e.message ?? 'An unknown error occurred.'));

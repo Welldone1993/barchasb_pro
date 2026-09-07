@@ -45,12 +45,30 @@ class _CustomSearchBarState extends ConsumerState<CustomSearchBar> {
             Expanded(
               child: TextField(
                 controller: _controller,
-                decoration: const InputDecoration(
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                onChanged: (value) {
+                  ref.read(homeProvider.notifier).searchAds(value);
+                },
+                decoration: InputDecoration(
                   hintText: 'جستجو...',
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
+                  suffixIcon: _controller.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            _controller.clear();
+                            ref.read(homeProvider.notifier).searchAds('');
+                          },
+                        )
+                      : null,
                 ),
                 style: const TextStyle(fontSize: 16),
               ),

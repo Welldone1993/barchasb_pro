@@ -41,13 +41,17 @@ class HomeNotifier extends StateNotifier<HomeState> {
     fetchAll();
   }
 
-  Future<void> fetchAll() async {
-    await Future.wait([fetchSellers(), fetchEmployers(), fetchJobSeekers()]);
+  Future<void> fetchAll({String? query}) async {
+    await Future.wait([
+      fetchSellers(query: query),
+      fetchEmployers(query: query),
+      fetchJobSeekers(query: query),
+    ]);
   }
 
-  Future<void> fetchSellers() async {
+  Future<void> fetchSellers({String? query}) async {
     state = state.copyWith(sellers: const AsyncValue.loading());
-    final result = await _homeRepository.getSellers();
+    final result = await _homeRepository.getSellers(query: query);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -57,10 +61,10 @@ class HomeNotifier extends StateNotifier<HomeState> {
     );
   }
 
-  Future<void> fetchEmployers() async {
+  Future<void> fetchEmployers({String? query}) async {
     state = state.copyWith(employers: const AsyncValue.loading());
 
-    final result = await _homeRepository.getEmployers();
+    final result = await _homeRepository.getEmployers(query: query);
     result.fold(
       (failure) => state = state.copyWith(
         employers: AsyncValue.error(failure.message, StackTrace.current),
@@ -69,9 +73,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
     );
   }
 
-  Future<void> fetchJobSeekers() async {
+  Future<void> fetchJobSeekers({String? query}) async {
     state = state.copyWith(jobSeekers: const AsyncValue.loading());
-    final result = await _homeRepository.getJobSeekers();
+    final result = await _homeRepository.getJobSeekers(query: query);
     result.fold(
       (failure) => state = state.copyWith(
         jobSeekers: AsyncValue.error(failure.message, StackTrace.current),
@@ -81,15 +85,17 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 
   void searchAds(String query) {
-    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
-
-    if (query.isEmpty) {
-      return;
-    }
-
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
-      fetchAll();
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      final trimmed = query.trim();
+      fetchAll(query: trimmed.isNotEmpty ? trimmed : null);
     });
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }
 
