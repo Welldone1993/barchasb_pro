@@ -5,7 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 class PluginsPage extends ConsumerWidget {
   const PluginsPage({super.key});
 
-  final String targetUrl = 'https://barchasb.org/dashboard/plugins/resume';
+  final String resumeUrl = 'https://barchasb.org/dashboard/plugins/resume';
+  final String testUrl = 'https://barchasb.org/dashboard/plugins/tests';
+  final String converterUrl =
+      'https://barchasb.org/dashboard/plugins/converter';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,59 +22,75 @@ class PluginsPage extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       // در صورتی که داخل اسکرول‌ویو دیگری قرار دارد
-      children: List.generate(4, (index) {
-        return _buildGridItem(context);
-      }),
+      children: [
+        _buildGridItem(
+          context,
+          imagePath: '📄',
+          title: 'رزومه ساز',
+          targetUrl: resumeUrl,
+        ),
+        _buildGridItem(
+          context,
+          imagePath: '🧠',
+          title: 'آزمون ها',
+          targetUrl: testUrl,
+        ),
+        _buildGridItem(
+          context,
+          imagePath: '🔁',
+          title: 'تبدیل ها',
+          targetUrl: converterUrl,
+        ),
+      ],
     );
   }
 
-  Widget _buildGridItem(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+  Widget _buildGridItem(
+    BuildContext context, {
+    required String imagePath,
+    required String title,
+    required String targetUrl,
+  }) => Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => _launchWebsite(context),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // تصویر آدمک شما از assets
-              Image.asset(
-                'assets/backgrounds/job_search.png',
-                // مسیر عکس خود را اینجا قرار دهید
-                height: 70,
-                width: 70,
-                fit: BoxFit.contain,
+        onTap: () => _launchWebsite(context, targetUrl: targetUrl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(imagePath, style: TextStyle(fontSize: 24)),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E3A5F), // رنگ سرمه‌ای تیره مشابه تصویر
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'رزومه ساز',
-                style: TextStyle(
-                  fontFamily: 'Vazirmatn',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E3A5F), // رنگ سرمه‌ای تیره مشابه تصویر
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 
-  Future<void> _launchWebsite(BuildContext context) async {
+  Future<void> _launchWebsite(
+    BuildContext context, {
+    required String targetUrl,
+  }) async {
     final Uri url = Uri.parse(targetUrl);
     try {
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
