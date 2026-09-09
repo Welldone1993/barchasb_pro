@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/entities/ad_entity.dart';
 
@@ -15,43 +16,51 @@ class WorkSpaceAdCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 350), // محدودیت عرض برای فرم‌های بزرگتر
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          )
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // گوشه تا شده
-          Positioned(
-            top: -1,
-            left: -1,
-            child: CustomPaint(
-              size: const Size(70, 70),
-              painter: FoldedCornerPainter(),
-            ),
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    constraints: const BoxConstraints(maxWidth: 350),
+    // محدودیت عرض برای فرم‌های بزرگتر
+    margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.grey.shade200),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 15,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // گوشه تا شده
+        Positioned(
+          top: -1,
+          left: -1,
+          child: CustomPaint(
+            size: const Size(70, 70),
+            painter: FoldedCornerPainter(),
           ),
+        ),
 
-          // محتوای اصلی کارت
-          Center(
+        // محتوای اصلی کارت
+        GestureDetector(
+          onTap: () => context.push('/seller_ad_detail/${ad.id}'),
+          child: Center(
             child: Padding(
-              padding: const EdgeInsets.only(top: 60.0, bottom: 40.0, left: 16.0, right: 16.0),
+              padding: const EdgeInsets.only(
+                top: 60.0,
+                bottom: 40.0,
+                left: 16.0,
+                right: 16.0,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,// مهم: برای جلوگیری از Overflow
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // مهم: برای جلوگیری از Overflow
                 children: [
                   // عکس پروفایل/آگهی با هاله کم‌رنگ
                   Container(
@@ -63,9 +72,13 @@ class WorkSpaceAdCard extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 40,
                       // بررسی وجود عکس و نمایش یک عکس پیش‌فرض در صورت نبود آن
-                      backgroundImage: (ad.imageUrl != null && ad.imageUrl!.isNotEmpty)
+                      backgroundImage:
+                          (ad.imageUrl != null && ad.imageUrl!.isNotEmpty)
                           ? NetworkImage(ad.imageUrl!)
-                          : const NetworkImage('https://via.placeholder.com/150?text=No+Image') as ImageProvider,
+                          : const NetworkImage(
+                                  'https://via.placeholder.com/150?text=No+Image',
+                                )
+                                as ImageProvider,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -85,24 +98,22 @@ class WorkSpaceAdCard extends StatelessWidget {
                   // دسته‌بندی یا نام فرد ثبت‌کننده
                   Text(
                     ad.category ?? ad.subCategories ?? 'بدون دسته‌بندی',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
 
                   // بج (Badge) - نمایش قیمت یا وضعیت
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5F7FA),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      ad.price != null
-                          ? '${ad.price} تومان'
-                          :'وضعیت نامشخص',
+                      ad.price != null ? '${ad.price} تومان' : 'وضعیت نامشخص',
                       style: const TextStyle(
                         color: Color(0xFF1E3A5F),
                         fontWeight: FontWeight.w600,
@@ -129,38 +140,38 @@ class WorkSpaceAdCard extends StatelessWidget {
               ),
             ),
           ),
+        ),
 
-          // تب نارنجی بالا
-          Positioned(
-            top: -15,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _OrangeTab(
-                isTop: true,
-                onTap: onUpPressed,
-                isActive: onUpPressed != null,
-              ),
+        // تب نارنجی بالا
+        Positioned(
+          top: -15,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _OrangeTab(
+              isTop: true,
+              onTap: onUpPressed,
+              isActive: onUpPressed != null,
             ),
           ),
+        ),
 
-          // تب نارنجی پایین
-          Positioned(
-            bottom: -15,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _OrangeTab(
-                isTop: false,
-                onTap: onDownPressed,
-                isActive: onDownPressed != null,
-              ),
+        // تب نارنجی پایین
+        Positioned(
+          bottom: -15,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _OrangeTab(
+              isTop: false,
+              onTap: onDownPressed,
+              isActive: onDownPressed != null,
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 
   Widget _buildTag(String title) {
     return Container(
@@ -184,18 +195,15 @@ class _OrangeTab extends StatelessWidget {
   final VoidCallback? onTap;
   final bool isActive;
 
-  const _OrangeTab({
-    required this.isTop,
-    this.onTap,
-    required this.isActive,
-  });
+  const _OrangeTab({required this.isTop, this.onTap, required this.isActive});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Opacity(
-        opacity: isActive ? 1.0 : 0.4, // اگر آگهی قبلی/بعدی نبود، دکمه کمرنگ شود
+        opacity: isActive ? 1.0 : 0.4,
+        // اگر آگهی قبلی/بعدی نبود، دکمه کمرنگ شود
         child: Container(
           width: 60,
           height: 30,
