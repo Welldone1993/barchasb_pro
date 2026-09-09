@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain/entities/digital_ad_entity.dart';
 
@@ -132,7 +133,7 @@ class DigitalAdCard extends StatelessWidget {
                     size: 22,
                   ),
                   onPressed: () {
-                    // عملکرد ذخیره
+                    // TODO: عملکرد ذخیره
                   },
                 ),
               ),
@@ -142,9 +143,9 @@ class DigitalAdCard extends StatelessWidget {
               SizedBox(
                 height: 38,
                 child: OutlinedButton(
-                  onPressed: () {
-                    // عملکرد مشاهده جزئیات
-                  },
+                  onPressed: () =>
+                      context.push('/digital_ad_detail/${digitalAd.id}'),
+
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: primaryColor),
                     shape: RoundedRectangleBorder(
