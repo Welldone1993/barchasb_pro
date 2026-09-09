@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/entities/employer_ad_entity.dart';
 import '../providers/employer_ads_provider.dart';
@@ -176,7 +177,7 @@ class EmployerCard extends StatelessWidget {
                         size: 20,
                       ),
                       onPressed: () {
-                        // عملیات ذخیره
+                        //TODO: عملیات ذخیره
                       },
                     ),
                   ),
@@ -187,9 +188,8 @@ class EmployerCard extends StatelessWidget {
                   child: SizedBox(
                     height: 38,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // رفتن به صفحه جزئیات
-                      },
+                      onPressed: () =>
+                          context.push('/employer_ad_detail/${ad.id}'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryDarkBlue,
                         foregroundColor: Colors.white,
