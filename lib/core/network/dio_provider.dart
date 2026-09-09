@@ -12,7 +12,7 @@ final dioProvider = Provider<Dio>((ref) {
 
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'https://barchasb.liara.run/api',
+      baseUrl: 'https://barchasb-apis.liara.run/api',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {
