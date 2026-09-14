@@ -1,503 +1,478 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/user_profile_entity.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../data/models/update_profile_dto.dart';
 import '../providers/profile_provider.dart';
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   final String userId;
 
   const ProfilePage({super.key, required this.userId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profileState = ref.watch(profileProvider(userId));
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FB),
-      appBar: AppBar(
-        title: const Text(
-          'پروفایل کاربری',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1E293B),
-      ),
-      body: profileState.when(
-        loading: () => const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 12),
-              Text(
-                'در حال دریافت اطلاعات...',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-        error: (error, stack) => Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.redAccent,
-                  size: 48,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => ref.refresh(profileProvider(userId)),
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('تلاش مجدد'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E3A5F),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        data: (profileData) => _ProfileContent(data: profileData),
-      ),
-    );
-  }
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfileContent extends StatelessWidget {
-  final UserProfileDataEntity data;
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  final _formKey = GlobalKey<FormState>();
 
-  const _ProfileContent({required this.data});
+  // Controllers for User fields
+  late TextEditingController _nameCtrl;
+  late TextEditingController _lastNameCtrl;
+  late TextEditingController _usernameCtrl;
+  late TextEditingController _phoneCtrl;
+  late TextEditingController _emailCtrl;
+  late TextEditingController _birthDateCtrl;
+  late TextEditingController _provinceCtrl;
+  late TextEditingController _cityCtrl;
+
+  // Controllers for Profile fields
+  late TextEditingController _addressCtrl;
+  late TextEditingController _educationCtrl;
+  late TextEditingController _aboutMeCtrl;
+  late TextEditingController _skillsCtrl;
+  late TextEditingController _interestsCtrl;
+
+  final ImagePicker _picker = ImagePicker();
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController();
+    _lastNameCtrl = TextEditingController();
+    _usernameCtrl = TextEditingController();
+    _phoneCtrl = TextEditingController();
+    _emailCtrl = TextEditingController();
+    _birthDateCtrl = TextEditingController();
+    _provinceCtrl = TextEditingController();
+    _cityCtrl = TextEditingController();
+
+    _addressCtrl = TextEditingController();
+    _educationCtrl = TextEditingController();
+    _aboutMeCtrl = TextEditingController();
+    _skillsCtrl = TextEditingController();
+    _interestsCtrl = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(profileNotifierProvider.notifier).fetchProfile(widget.userId);
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _lastNameCtrl.dispose();
+    _usernameCtrl.dispose();
+    _phoneCtrl.dispose();
+    _emailCtrl.dispose();
+    _birthDateCtrl.dispose();
+    _provinceCtrl.dispose();
+    _cityCtrl.dispose();
+    _addressCtrl.dispose();
+    _educationCtrl.dispose();
+    _aboutMeCtrl.dispose();
+    _skillsCtrl.dispose();
+    _interestsCtrl.dispose();
+    super.dispose();
+  }
+
+  void _populateFields(dynamic profileData) {
+    if (_isInitialized || profileData == null) return;
+
+    final user = profileData.user;
+    final profile = profileData.profile;
+
+    if (user != null) {
+      _nameCtrl.text = user.name ?? '';
+      _lastNameCtrl.text = user.lastName ?? '';
+      _usernameCtrl.text = user.username ?? '';
+      _phoneCtrl.text = user.phone ?? '';
+      _emailCtrl.text = user.email ?? '';
+      _birthDateCtrl.text = user.birthDate ?? '';
+      _provinceCtrl.text = user.province ?? '';
+      _cityCtrl.text = user.city ?? '';
+    }
+
+    if (profile != null) {
+      _addressCtrl.text = profile.address ?? '';
+      _educationCtrl.text = profile.educationLevel ?? '';
+      _aboutMeCtrl.text = profile.aboutMe ?? '';
+      _skillsCtrl.text = profile.skills?.join(', ') ?? '';
+      _interestsCtrl.text = profile.interests?.join(', ') ?? '';
+    }
+
+    _isInitialized = true;
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      final file = File(image.path);
+      await ref.read(profileNotifierProvider.notifier).uploadProfilePhoto(file);
+    }
+  }
+
+  Future<void> _saveProfile() async{
+    if (!_formKey.currentState!.validate()) return;
+
+    final skillsList = _skillsCtrl.text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    final interestsList = _interestsCtrl.text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    final dto = UpdateProfileDto(
+      user: UpdateUserDataDto(
+        name: _nameCtrl.text.trim(),
+        lastName: _lastNameCtrl.text.trim(),
+        username: _usernameCtrl.text.trim(),
+        phone: _phoneCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        birthDate: _birthDateCtrl.text.trim(),
+        province: _provinceCtrl.text.trim(),
+        city: _cityCtrl.text.trim(),
+      ),
+      profile: UpdateProfileDataDto(
+        address: _addressCtrl.text.trim(),
+        educationLevel: _educationCtrl.text.trim(),
+        aboutMe: _aboutMeCtrl.text.trim(),
+        skills: skillsList,
+        interests: interestsList,
+      ),
+    );
+
+   final result = await ref.read(profileNotifierProvider.notifier).updateProfile(dto);
+   if(result && context.mounted){
+       context.pushReplacement('/dashboard');
+   }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final user = data.user;
-    final profile = data.profile;
+    final state = ref.watch(profileNotifierProvider);
+
+    ref.listen<ProfileState>(profileNotifierProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              next.errorMessage!,
+              style: const TextStyle(fontFamily: 'IRANYekan'),
+            ),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+      if (next.successMessage != null &&
+          next.successMessage != previous?.successMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              next.successMessage!,
+              style: const TextStyle(fontFamily: 'IRANYekan'),
+            ),
+            backgroundColor: Colors.green.shade700,
+          ),
+        );
+      }
+      if (next.profileData != null && !_isInitialized) {
+        _populateFields(next.profileData);
+      }
+    });
+
+    if (state.isLoading && state.profileData == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final profileImage = state.profileData?.profile?.profileImage;
 
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'پروفایل کاربری',
+            style: TextStyle(
+              fontFamily: 'IRANYekan',
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          child: Column(
-            children: [
-              // عکس پروفایل با آیکون ادیت
-              Center(
-                child: Stack(
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // بخش آواتار با مداد ویرایش
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 54,
+                        backgroundColor: Colors.grey.shade200,
+                        backgroundImage:
+                            (profileImage != null && profileImage.isNotEmpty)
+                            ? NetworkImage(profileImage)
+                            : null,
+                        child: (profileImage == null || profileImage.isEmpty)
+                            ? const Icon(
+                                Icons.person,
+                                size: 54,
+                                color: Colors.grey,
+                              )
+                            : null,
+                      ),
+                      if (state.isUploadingPhoto)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.black45,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: state.isUploadingPhoto
+                              ? null
+                              : _pickAndUploadImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // فیلدهای اطلاعات کاربری (User)
+                _buildSectionHeader('اطلاعات حساب کاربری'),
+                const SizedBox(height: 12),
+                Row(
                   children: [
-                    CircleAvatar(
-                      radius: 46,
-                      backgroundColor: const Color(0xFFE2E8F0),
-                      backgroundImage:
-                          (profile.profileImage != null &&
-                              profile.profileImage!.isNotEmpty)
-                          ? NetworkImage(profile.profileImage!)
-                          : null,
-                      child:
-                          (profile.profileImage == null ||
-                              profile.profileImage!.isEmpty)
-                          ? const Icon(
-                              Icons.person,
-                              size: 48,
-                              color: Colors.grey,
-                            )
-                          : null,
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _nameCtrl,
+                        label: 'نام',
+                        icon: Icons.person_outline,
+                      ),
                     ),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFFCBD5E1)),
-                        ),
-                        child: const Icon(
-                          Icons.edit_outlined,
-                          size: 16,
-                          color: Color(0xFF1E3A5F),
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _lastNameCtrl,
+                        label: 'نام خانوادگی',
+                        icon: Icons.person_outline,
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              // نام کاربری
-              _buildLabeledField(
-                label: 'نام کاربری',
-                value: user.username ?? 'ثبت نشده',
-              ),
-              const SizedBox(height: 12),
-
-              // شماره تلفن با دکمه تایید
-              _buildVerifiedField(
-                label: 'شماره تلفن',
-                value: user.phone,
-                isConfirmed: user.phoneConfirmed,
-              ),
-              const SizedBox(height: 12),
-
-              // ایمیل با دکمه تایید
-              _buildVerifiedField(
-                label: 'ایمیل',
-                value: user.email ?? 'ثبت نشده',
-                isConfirmed: user.emailConfirmed,
-              ),
-              const SizedBox(height: 12),
-
-              // کد ملی
-              _buildLabeledField(
-                label: 'کد ملی',
-                value: user.nationalCode ?? 'ثبت نشده',
-              ),
-
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Divider(color: Color(0xFFE2E8F0)),
-              ),
-
-              // نام و نام خانوادگی
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildLabeledField(label: 'نام', value: user.name),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildLabeledField(
-                      label: 'نام خانوادگی',
-                      value: user.lastName,
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _usernameCtrl,
+                  label: 'نام کاربری',
+                  icon: Icons.alternate_email,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _phoneCtrl,
+                        label: 'شماره تماس',
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // استان و شهر
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildLabeledField(
-                      label: 'استان',
-                      value: user.province ?? 'ثبت نشده',
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _emailCtrl,
+                        label: 'ایمیل',
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildLabeledField(
-                      label: 'شهر',
-                      value: user.city ?? 'ثبت نشده',
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _provinceCtrl,
+                        label: 'استان',
+                        icon: Icons.location_city_outlined,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // آدرس
-              _buildLabeledField(
-                label: 'آدرس',
-                value: profile.address ?? 'ثبت نشده',
-              ),
-              const SizedBox(height: 12),
-
-              // مدرک تحصیلی و تاریخ تولد
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildLabeledField(
-                      label: 'آخرین مدرک تحصیلی',
-                      value: profile.educationLevel ?? 'ثبت نشده',
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _cityCtrl,
+                        label: 'شهر',
+                        icon: Icons.location_on_outlined,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildLabeledField(
-                      label: 'تاریخ تولد',
-                      value: user.birthDate ?? 'ثبت نشده',
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _birthDateCtrl,
+                  label: 'تاریخ تولد',
+                  icon: Icons.cake_outlined,
+                ),
+
+                const SizedBox(height: 24),
+                // فیلدهای اطلاعات تکمیلی و مهارت‌ها (Profile)
+                _buildSectionHeader('اطلاعات تکمیلی و مهارت‌ها'),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _educationCtrl,
+                  label: 'سطح تحصیلات',
+                  icon: Icons.school_outlined,
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _skillsCtrl,
+                  label: 'مهارت‌ها (با کاما جدا کنید)',
+                  icon: Icons.star_border,
+                  hintText: 'Flutter, NestJS, Git, UI/UX',
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _interestsCtrl,
+                  label: 'علاقه‌مندی‌ها (با کاما جدا کنید)',
+                  icon: Icons.favorite_border,
+                  hintText: 'طراحی، برنامه‌نویسی، مطالعه',
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _addressCtrl,
+                  label: 'آدرس',
+                  icon: Icons.home_outlined,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _aboutMeCtrl,
+                  label: 'درباره من',
+                  icon: Icons.info_outline,
+                  maxLines: 3,
+                ),
+
+                const SizedBox(height: 32),
+                // دکمه ذخیره تغییرات
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: state.isSaving ? null : _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: state.isSaving
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'ذخیره تغییرات',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'IRANYekan',
+                            ),
+                          ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // درباره من
-              _buildLabeledField(
-                label: 'درباره من',
-                value: profile.aboutMe ?? 'توضیحاتی ثبت نشده است...',
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-
-              // علاقه‌مندی‌ها
-              _buildChipSection(
-                title: 'علاقه‌مندی‌ها',
-                items: profile.interests,
-                placeholder: 'علاقه‌مندی‌ها...',
-              ),
-              const SizedBox(height: 16),
-
-              // مهارت‌ها
-              _buildChipSection(
-                title: 'مهارت‌ها',
-                items: profile.skills,
-                placeholder: 'مهارت‌ها...',
-              ),
-              const SizedBox(height: 20),
-
-              const Divider(color: Color(0xFFE2E8F0)),
-              const SizedBox(height: 12),
-
-              // بارگذاری رزومه و نمونه‌کارها (Placeholder برای استپ‌های بعدی)
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildUploadPlaceholder(
-                      title: 'بارگذاری فایل رزومه',
-                      fileName: profile.resumeFile,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildUploadPlaceholder(
-                      title: 'بارگذاری نمونه کارها',
-                      fileName: profile.portfolioFiles.isNotEmpty
-                          ? '${profile.portfolioFiles.length} فایل'
-                          : null,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLabeledField({
+  Widget _buildSectionHeader(String title) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'IRANYekan',
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
     required String label,
-    required String value,
+    required IconData icon,
+    String? hintText,
+    TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w600,
-          ),
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      style: const TextStyle(fontFamily: 'IRANYekan', fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hintText,
+        prefixIcon: Icon(icon, size: 20),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
         ),
-        const SizedBox(height: 6),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE2E8F0).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value,
-            maxLines: maxLines,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF334155)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVerifiedField({
-    required String label,
-    required String value,
-    required bool isConfirmed,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE2E8F0).withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF334155),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: isConfirmed
-                    ? const Color(0xFF1E3A5F)
-                    : const Color(0xFF94A3B8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                isConfirmed ? 'تأیید شده' : 'تأیید نشده',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChipSection({
-    required String title,
-    required List<String> items,
-    required String placeholder,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        if (items.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE2E8F0).withOpacity(0.6),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              placeholder,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-            ),
-          )
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: items.map((item) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFFCBD5E1)),
-                ),
-                child: Text(
-                  item,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF334155),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildUploadPlaceholder({required String title, String? fileName}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE2E8F0).withOpacity(0.6),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.attach_file, size: 14, color: Colors.grey),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  fileName ?? 'فایلی وجود ندارد',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF64748B),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

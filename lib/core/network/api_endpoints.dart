@@ -12,6 +12,8 @@ class ApiEndpoints {
   // Profile
   static const profileController = '/profile';
   static const getProfile = profileController;
+  static const updateProfile = profileController;
+  static const updateProfilePhoto = '$profileController/upload-photo';
 
   // ads
   static const adsController = '/ads';
