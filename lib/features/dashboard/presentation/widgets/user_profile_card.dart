@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../providers/dashboard_provider.dart';
@@ -63,7 +64,7 @@ class UserProfileCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: IconButton(
                   icon: Icon(Icons.edit_outlined, size: 20),
-                  onPressed: () {},
+                  onPressed: () => context.push('/profile'),
                 ),
               ),
             ],

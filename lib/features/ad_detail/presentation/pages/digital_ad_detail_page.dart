@@ -39,10 +39,7 @@ class DigitalAdDetailPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // ریفرش و تلاش مجدد برای دریافت اطلاعات
-                    ref.refresh(digitalAdDetailProvider(adId));
-                  },
+                  onPressed: () => ref.refresh(digitalAdDetailProvider(adId)),
                   icon: const Icon(Icons.refresh),
                   label: const Text('تلاش مجدد'),
                   style: ElevatedButton.styleFrom(

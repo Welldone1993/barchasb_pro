@@ -9,6 +9,10 @@ class ApiEndpoints {
   static const otpController = '/otp';
   static const String sendOtp = '$otpController/send';
 
+  // Profile
+  static const profileController = '/profile';
+  static const getProfile = profileController;
+
   // ads
   static const adsController = '/ads';
   static const String jobseekerAds = '$adsController/jobseeker';
