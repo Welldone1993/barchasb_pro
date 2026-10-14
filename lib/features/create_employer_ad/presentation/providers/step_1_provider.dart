@@ -9,6 +9,7 @@ class Step1Data {
   final String category;
   final List<JobCategoryModel> categories;
   final String description;
+  final bool isForSelf;
 
   Step1Data({
     this.imagePath,
@@ -17,6 +18,7 @@ class Step1Data {
     this.category = '',
     this.categories = const [],
     this.description = '',
+    this.isForSelf = false,
   });
 
   Step1Data copyWith({
@@ -26,6 +28,7 @@ class Step1Data {
     String? category,
     List<JobCategoryModel>? categories,
     String? description,
+    bool? isForSelf,
   }) {
     return Step1Data(
       imagePath: imagePath ?? this.imagePath,
@@ -34,6 +37,7 @@ class Step1Data {
       category: category ?? this.category,
       categories: categories ?? this.categories,
       description: description ?? this.description,
+      isForSelf: isForSelf ?? this.isForSelf,
     );
   }
 }
@@ -48,6 +52,8 @@ class Step1Notifier extends StateNotifier<Step1Data> {
     String? category,
     List<JobCategoryModel>? categories,
     String? description,
+    bool? isForSelf,
+
   }) {
     state = state.copyWith(
       imagePath: imagePath,
@@ -56,6 +62,7 @@ class Step1Notifier extends StateNotifier<Step1Data> {
       category: category,
       categories: categories,
       description: description,
+      isForSelf: isForSelf,
     );
   }
 }

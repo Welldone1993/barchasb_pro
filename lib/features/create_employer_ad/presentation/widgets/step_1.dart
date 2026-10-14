@@ -30,7 +30,16 @@ class Step1BasicInfoScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const SizedBox(height: 40),
+            // --- سوییچ برای خودم / دیگری ---
+            Center(
+              child: AdTargetToggle(
+                isForSelf: formData.isForSelf,
+                onChanged: (isForSelf) {
+                  ref.read(step1Provider.notifier).updateData(isForSelf: isForSelf);
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
             // --- انتخاب عکس پروفایل ---
             GestureDetector(
               onTap: () => _pickImage(ref),
@@ -199,5 +208,144 @@ class Step1BasicInfoScreen extends ConsumerWidget {
             categories: categories,
           );
     }
+  }
+}
+
+
+// ==========================================
+// ویجت سوییچ خودم / دیگری مطابق طرح Figma
+// ==========================================
+class AdTargetToggle extends StatefulWidget {
+  final bool isForSelf;
+  final ValueChanged<bool>? onChanged;
+
+  const AdTargetToggle({
+    super.key,
+    this.isForSelf = true,
+    this.onChanged,
+  });
+
+  @override
+  State<AdTargetToggle> createState() => _AdTargetToggleState();
+}
+
+class _AdTargetToggleState extends State<AdTargetToggle> {
+  late bool _isForSelf;
+
+  @override
+  void initState() {
+    super.initState();
+    _isForSelf = widget.isForSelf;
+  }
+
+  @override
+  void didUpdateWidget(covariant AdTargetToggle oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isForSelf != widget.isForSelf) {
+      _isForSelf = widget.isForSelf;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const activeColor = Color(0xFF0F3057);
+
+    return FittedBox(
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'می‌خواهم برای',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF333333),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 38,
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F4F7),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: const Color(0xFFE4E7EC),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildOption(
+                    title: 'خودم',
+                    isSelected: _isForSelf,
+                    activeColor: activeColor,
+                    onTap: () {
+                      if (!_isForSelf) {
+                        setState(() => _isForSelf = true);
+                        widget.onChanged?.call(true);
+                      }
+                    },
+                  ),
+                  _buildOption(
+                    title: 'دیگری',
+                    isSelected: !_isForSelf,
+                    activeColor: activeColor,
+                    onTap: () {
+                      if (_isForSelf) {
+                        setState(() => _isForSelf = false);
+                        widget.onChanged?.call(false);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'آگهی بگذارم',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF333333),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOption({
+    required String title,
+    required bool isSelected,
+    required Color activeColor,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : Colors.black87,
+          ),
+        ),
+      ),
+    );
   }
 }
