@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/employer_ad_provider.dart';
+import '../providers/job_category_dialog_provider.dart';
 import '../providers/step_1_provider.dart';
 import '../providers/step_2_provider.dart';
 import '../providers/step_3_provider.dart';
@@ -102,6 +103,7 @@ class Step5WaitingScreen extends ConsumerWidget {
                     ref.invalidate(step2Provider);
                     ref.invalidate(step3Provider);
                     ref.invalidate(step4Provider);
+                    ref.invalidate(jobCategoryDialogProvider);
                     context.go('/dashboard');
                   },
                   child: const Text(

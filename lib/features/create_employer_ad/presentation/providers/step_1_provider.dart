@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../data/models/job_category_model.dart';
+
 class Step1Data {
   final String? imagePath;
   final String name;
   final String title;
   final String category;
+  final List<JobCategoryModel> categories;
   final String description;
 
   Step1Data({
@@ -12,6 +15,7 @@ class Step1Data {
     this.name = '',
     this.title = '',
     this.category = '',
+    this.categories = const [],
     this.description = '',
   });
 
@@ -20,6 +24,7 @@ class Step1Data {
     String? name,
     String? title,
     String? category,
+    List<JobCategoryModel>? categories,
     String? description,
   }) {
     return Step1Data(
@@ -27,6 +32,7 @@ class Step1Data {
       name: name ?? this.name,
       title: title ?? this.title,
       category: category ?? this.category,
+      categories: categories ?? this.categories,
       description: description ?? this.description,
     );
   }
@@ -40,6 +46,7 @@ class Step1Notifier extends StateNotifier<Step1Data> {
     String? name,
     String? title,
     String? category,
+    List<JobCategoryModel>? categories,
     String? description,
   }) {
     state = state.copyWith(
@@ -47,12 +54,12 @@ class Step1Notifier extends StateNotifier<Step1Data> {
       name: name,
       title: title,
       category: category,
+      categories: categories,
       description: description,
     );
   }
 }
 
-final step1Provider =
-StateNotifierProvider<Step1Notifier, Step1Data>((ref) {
+final step1Provider = StateNotifierProvider<Step1Notifier, Step1Data>((ref) {
   return Step1Notifier();
 });

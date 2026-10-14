@@ -9,4 +9,8 @@ abstract class CreateEmployerAdRepository {
   );
 
   Future<Either<Failure, dynamic>> sendOtp(String phone);
-}
+
+  Future<Either<Failure, dynamic>> getMainCategories();
+
+  Future<Either<Failure, dynamic>> getSubCategories(String parentId);
+ }

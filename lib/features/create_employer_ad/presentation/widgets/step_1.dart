@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:barchasb/core/utils/extension/string_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../providers/employer_ad_provider.dart';
 import '../providers/step_1_provider.dart';
+import 'job_category_dialog.dart';
 
 class Step1BasicInfoScreen extends ConsumerWidget {
   const Step1BasicInfoScreen({super.key});
@@ -181,123 +183,21 @@ class Step1BasicInfoScreen extends ConsumerWidget {
   }
 
   // --- دیالوگ دسته بندی ها ---
-  void _showCategoryDialog(BuildContext context, WidgetRef ref) {
-    // یک لیست نمونه برای دسته بندی ها
-    final categories = [
-      'بازی سازی',
-      'برنامه نویسی',
-      'طراحی گرافیک',
-      'دیجیتال مارکتینگ',
-    ];
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: const Color(0xFFF5F6F8),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // هدر دیالوگ
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'انتخاب دسته ها',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.redAccent,
-                        child: Icon(Icons.close, size: 16, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // باکس جستجو
-                TextField(
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    hintText: '... جستجوی دسته',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // لیست دسته‌ها
-                SizedBox(
-                  height: 300, // محدود کردن ارتفاع لیست
-                  child: ListView.builder(
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          // با کلیک روی دسته، مقدار در پروایدر آپدیت شده و دیالوگ بسته میشود
-                          ref
-                              .read(step1Provider.notifier)
-                              .updateData(category: categories[index]);
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // چک باکس دکوری (غیر فعال، فقط برای نمایش)
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade300,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              Text(
-                                categories[index],
-                                style: const TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  Future<void> _showCategoryDialog(BuildContext context, WidgetRef ref) async {
+    final result = await JobCategoryDialog.show(
+      context,
+      initialSelected: ref.watch(step1Provider).categories,
     );
+
+    if (result != null && result.isNotEmpty) {
+      final categories = result;
+      ref
+          .read(step1Provider.notifier)
+          .updateData(
+            category: "${categories.length.toString().toPersianDigits} دسته ",
+            categories: categories,
+          );
+    }
   }
 }

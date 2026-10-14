@@ -7,6 +7,10 @@ abstract class CreateEmployerAdRemoteDataSource {
   Future<dynamic> createEmployerAd(CreateEmployerAdRequestDto employerAd);
 
   Future<dynamic> sendOtp(String phone);
+
+  Future<dynamic> getMainCategories();
+
+  Future<dynamic> getSubCategories(String parentId);
 }
 
 class CreateEmployerAdRemoteDataSourceImpl
@@ -35,6 +39,22 @@ class CreateEmployerAdRemoteDataSourceImpl
     final response = await _dio.post(
       ApiEndpoints.sendOtp,
       data: {'phone': phone, 'purpose': 'default'},
+    );
+
+    return response;
+  }
+
+  @override
+  Future<dynamic> getMainCategories() async {
+    final response = await _dio.get(ApiEndpoints.getMainJobCategories);
+    return response;
+  }
+
+  @override
+  Future<dynamic> getSubCategories(String parentId) async {
+    final response = await _dio.get(
+      ApiEndpoints.getSubJobCategories,
+      queryParameters: {'parentId': parentId},
     );
 
     return response;

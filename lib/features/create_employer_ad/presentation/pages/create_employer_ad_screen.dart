@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/app_drawer_menu.dart';
 import '../providers/employer_ad_provider.dart';
+import '../providers/job_category_dialog_provider.dart';
 import '../providers/step_1_provider.dart';
 import '../providers/step_2_provider.dart';
 import '../providers/step_3_provider.dart';
@@ -201,6 +202,7 @@ class _EmployerAddJobScreenState extends ConsumerState<EmployerAddJobScreen> {
     ref.invalidate(step2Provider);
     ref.invalidate(step3Provider);
     ref.invalidate(step4Provider);
+    ref.invalidate(jobCategoryDialogProvider);
     context.go('/dashboard');
   }
 

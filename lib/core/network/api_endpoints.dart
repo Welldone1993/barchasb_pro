@@ -35,9 +35,14 @@ class ApiEndpoints {
   static const String createSellerAd = '$adsController/seller';
   static const String createJobseekerAd = '$adsController/jobseeker';
 
+  // job-categories
+  static const jobCategoriesController = '/job-categories';
+  static const String getMainJobCategories = '$jobCategoriesController/main';
+  static const String getSubJobCategories = '$jobCategoriesController/sub';
+
   // user-view
-  static const userViewController = '/user-views';
-  static const weeklyStats =
+  static const String userViewController = '/user-views';
+  static const String weeklyStats =
       '$userViewController?period=weekly&adType=JobSeekerAd';
 
   // public
